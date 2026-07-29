@@ -11,7 +11,7 @@
 </head>
 <body class="bg-gray-100 font-sans pb-28">
 
-    <!-- HEADER / ÜST BANT (Admin butonu kaldırıldı) -->
+    <!-- HEADER / ÜST BANT -->
     <header class="bg-red-700 text-white p-4 shadow-lg sticky top-0 z-40 flex justify-between items-center">
         <div>
             <h1 class="text-2xl font-black tracking-wide">🥙 BABACAN DÖNER</h1>
@@ -25,7 +25,7 @@
             <i class="fa-solid fa-truck-fast text-xl shrink-0"></i>
             <div>
                 <span>📍 Adresimiz: Sanayi Mahallesi Özel Cad. 16/C, Dörtyol / Hatay</span>
-                <p class="text-red-950 text-xs mt-0.5">⚠️ <strong>Teslimat Bilgisi:</strong> İşletmemizden 6.99 km üzeri mesafelere +70 TL getirme/kurye ücreti eklenmektedir.</p>
+                <p class="text-red-950 text-xs mt-0.5">⚠️ <strong>Otomatik Konum Hesabı:</strong> Konumunuza göre 6.99 km üzeri mesafelerde sepetinize otomatik +70 TL kurye ücreti eklenir.</p>
             </div>
         </div>
     </div>
@@ -95,15 +95,25 @@
 
             <!-- Modal İçerik -->
             <div class="p-4 overflow-y-auto space-y-4 flex-1">
-                <div class="bg-amber-100 border-l-4 border-amber-500 p-2.5 rounded text-xs text-amber-900 font-medium">
-                    📍 <strong>Hatırlatma:</strong> Sanayi Mahallesi 16/C Dörtyol adresimize 6.99 KM üzeri mesafeler için +70 TL kurye teslimat ücreti eklenmektedir.
+                
+                <!-- Konum İzin / Mesafe Bilgisi Kutusu -->
+                <div id="locationStatusBox" class="bg-blue-50 border border-blue-200 p-3 rounded-xl flex items-center justify-between gap-2">
+                    <div class="text-xs text-blue-900">
+                        <i class="fa-solid fa-location-crosshairs text-blue-600 text-base mr-1"></i>
+                        <span id="locationStatusText">Teslimat ücreti hesabı için konumunuzu doğrulayın.</span>
+                    </div>
+                    <button onclick="getUserLocation()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg shrink-0 transition">
+                        Konum Hesapla
+                    </button>
                 </div>
 
+                <!-- Sepetteki Ürünler -->
                 <div>
                     <h4 class="font-bold border-b pb-1 text-gray-700 text-sm">Sepet Özeti</h4>
                     <div id="cartItemsList" class="space-y-2 mt-2 max-h-36 overflow-y-auto pr-1"></div>
                 </div>
 
+                <!-- Detaylı Adres Bilgileri -->
                 <div class="space-y-2">
                     <h4 class="font-bold border-b pb-1 text-gray-700 text-sm">Teslimat Bilgileri</h4>
                     <div class="grid grid-cols-2 gap-2">
@@ -122,6 +132,7 @@
                     <textarea id="custNote" placeholder="Sipariş Notu / Adres Tarifi (Örn: Sos bol olsun)" class="p-2.5 border rounded-lg text-sm w-full h-16 focus:ring-1 focus:ring-red-600 outline-none"></textarea>
                 </div>
 
+                <!-- Ödeme Seçeneği -->
                 <div>
                     <h4 class="font-bold border-b pb-1 text-gray-700 text-sm mb-2">Ödeme Yöntemi Seçin</h4>
                     <div class="grid grid-cols-2 gap-3">
@@ -145,7 +156,7 @@
         </div>
     </div>
 
-    <!-- GİZLİ MODAL: ADMIN PANELI (URL'de #admin olduğunda tetiklenir) -->
+    <!-- GİZLİ MODAL: ADMIN PANELI (#admin) -->
     <div id="adminModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
@@ -163,22 +174,20 @@
 
             <!-- Yönetim İçeriği -->
             <div id="adminControlSection" class="hidden space-y-6">
-                <!-- Yeni Ürün Ekle -->
                 <form onsubmit="handleAddProduct(event)" class="bg-gray-50 p-4 rounded-xl border space-y-3">
                     <h4 class="font-bold text-gray-700 text-sm">Yeni Ürün Ekle</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <input type="text" id="pTitle" placeholder="Ürün Adı (Örn: Hatay Usulü Zurna)" required class="p-2 border rounded text-xs">
+                        <input type="text" id="pTitle" placeholder="Ürün Adı" required class="p-2 border rounded text-xs">
                         <input type="number" step="0.01" id="pPrice" placeholder="Fiyat (TL)" required class="p-2 border rounded text-xs">
-                        <input type="text" id="pCategory" placeholder="Kategori (Örn: Dönerler, İçecekler)" required class="p-2 border rounded text-xs">
+                        <input type="text" id="pCategory" placeholder="Kategori" required class="p-2 border rounded text-xs">
                         <input type="url" id="pImg" placeholder="Görsel URL (Link)" class="p-2 border rounded text-xs">
                     </div>
-                    <textarea id="pDesc" placeholder="Ürün Açıklaması (Sarımsaklı mayonez, sos, turşu vb.)" class="p-2 border rounded text-xs w-full h-16"></textarea>
+                    <textarea id="pDesc" placeholder="Ürün Açıklaması" class="p-2 border rounded text-xs w-full h-16"></textarea>
                     <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg text-xs">
                         <i class="fa-solid fa-plus"></i> Ürünü Menüye Ekle
                     </button>
                 </form>
 
-                <!-- Mevcut Ürünler -->
                 <div>
                     <div class="flex justify-between items-center mb-2">
                         <h4 class="font-bold text-gray-700 text-sm">Menüdeki Ürünler</h4>
@@ -192,8 +201,17 @@
 
     <!-- JAVASCRIPT KODLARI -->
     <script>
-        const WHATSAPP_NUMBER = "905429099"; // WhatsApp Numarası
-        const ADMIN_PASS = "2026babacan";     // Güncellenmiş Admin Şifresi
+        const WHATSAPP_NUMBER = "905429099"; 
+        const ADMIN_PASS = "2026babacan";     
+
+        // DÜKKAN KOORDİNATLARI (Dörtyol Sanayi Mah. Özel Cad. 16/C)
+        const SHOP_LAT = 36.8525; 
+        const SHOP_LNG = 36.2305;
+        const EXTRA_FEE = 70; // 6.99 km üzerindekilere eklenecek ücret
+        const MAX_FREE_KM = 6.99;
+
+        let userDistance = 0;
+        let deliveryFeeApplied = false;
 
         const defaultProducts = [
             { id: 1, title: "Hatay Usulü Tavuk Döner Dürüm", price: 110, category: "Dönerler", img: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=500", desc: "Özel Antakya sosu, sarımsaklı mayonez, patates kızartması ve turşu." },
@@ -215,7 +233,58 @@
             checkHashForAdmin();
         });
 
-        // URL Hash Kontrolü (#admin)
+        // HAVERSINE FORMÜLÜ (2 koordinat arası KM ölçümü)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Dünya yarıçapı (km)
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c; 
+        }
+
+        // KONUM ALMA FONKSİYONU
+        function getUserLocation() {
+            const statusText = document.getElementById('locationStatusText');
+            const statusBox = document.getElementById('locationStatusBox');
+
+            if (!navigator.geolocation) {
+                alert("Tarayıcınız konum servislerini desteklemiyor.");
+                return;
+            }
+
+            statusText.innerText = "Konumunuz alınıyor...";
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const uLat = position.coords.latitude;
+                    const uLng = position.coords.longitude;
+                    
+                    userDistance = calculateDistance(SHOP_LAT, SHOP_LNG, uLat, uLng);
+                    
+                    if (userDistance > MAX_FREE_KM) {
+                        deliveryFeeApplied = true;
+                        statusBox.className = "bg-amber-100 border border-amber-300 p-3 rounded-xl flex items-center justify-between gap-2";
+                        statusText.innerHTML = `📍 Mesafeniz <strong>${userDistance.toFixed(2)} km</strong> (6.99 km üzeri olduğu için +70 TL kurye ücreti yansıtıldı).`;
+                    } else {
+                        deliveryFeeApplied = false;
+                        statusBox.className = "bg-green-100 border border-green-300 p-3 rounded-xl flex items-center justify-between gap-2";
+                        statusText.innerHTML = `📍 Mesafeniz <strong>${userDistance.toFixed(2)} km</strong> (Kurye ücreti aranmamaktadır).`;
+                    }
+                    updateCartBadge();
+                    renderCartItems();
+                },
+                (error) => {
+                    alert("Konum izni verilemedi. Lütfen tarayıcı ayarlarından konum iznini kontrol edin.");
+                    statusText.innerText = "Konum alınamadı. Manuel adres bilgisi giriniz.";
+                }
+            );
+        }
+
+        // HASH KONTROLÜ (#admin)
         function checkHashForAdmin() {
             if (window.location.hash === '#admin') {
                 document.getElementById('adminModal').classList.remove('hidden');
@@ -246,7 +315,7 @@
 
         window.addEventListener('hashchange', checkHashForAdmin);
 
-        // KATEGORİ & ÜRÜN ÇİZİM İŞLEMLERİ
+        // KATEGORİ & ÜRÜN ÇİZİMİ
         function renderCategories() {
             const categories = ["Tümü", ...new Set(products.map(p => p.category))];
             const container = document.getElementById('categoryContainer');
@@ -334,7 +403,12 @@
 
         function updateCartBadge() {
             const count = cart.reduce((sum, item) => sum + item.count, 0);
-            const total = cart.reduce((sum, item) => sum + (item.price * item.count), 0);
+            let total = cart.reduce((sum, item) => sum + (item.price * item.count), 0);
+            
+            if (deliveryFeeApplied && count > 0) {
+                total += EXTRA_FEE;
+            }
+
             document.getElementById('cartCount').innerText = count;
             document.getElementById('totalPrice').innerText = `${total.toFixed(2)} TL`;
         }
@@ -354,7 +428,7 @@
 
         function renderCartItems() {
             const container = document.getElementById('cartItemsList');
-            container.innerHTML = cart.map(item => `
+            let itemsHTML = cart.map(item => `
                 <div class="flex justify-between items-center bg-gray-50 p-2 rounded text-xs border">
                     <div>
                         <span class="font-bold text-gray-800">${item.title}</span>
@@ -367,6 +441,17 @@
                     </div>
                 </div>
             `).join('');
+
+            if (deliveryFeeApplied) {
+                itemsHTML += `
+                    <div class="flex justify-between items-center bg-amber-50 p-2 rounded text-xs border border-amber-200 text-amber-900 font-bold">
+                        <span>🚀 Kurye / Getirme Ücreti (>6.99 km)</span>
+                        <span>+70.00 TL</span>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = itemsHTML;
         }
 
         function sendWhatsAppOrder() {
@@ -394,6 +479,7 @@
             text += `🏙️ *İlçe/Mahalle:* ${district} / ${neighborhood}\n`;
             text += `🛣️ *Cadde/Sokak:* ${street}\n`;
             text += `🏢 *Bina/Daire:* No: ${building}, D: ${apt}\n`;
+            if (userDistance > 0) text += `📏 *Hesaplanan Mesafe:* ${userDistance.toFixed(2)} km\n`;
             if (note) text += `📝 *Sipariş Notu:* ${note}\n`;
             text += `\n💳 *Ödeme Yöntemi:* ${payment}\n\n`;
 
@@ -405,8 +491,12 @@
                 text += `• ${item.title} x${item.count} = ${subtotal.toFixed(2)} TL\n`;
             });
 
-            text += `\n*💰 Toplam Tutar:* ${total.toFixed(2)} TL\n`;
-            text += `⚠️ *(İşletmeye 6.99 KM üzeri mesafelerde +70 TL kurye ücreti yansıtılabilir)*`;
+            if (deliveryFeeApplied) {
+                total += EXTRA_FEE;
+                text += `• *Kurye Ücreti (>6.99 km):* 70.00 TL\n`;
+            }
+
+            text += `\n*💰 Toplam Tutar:* ${total.toFixed(2)} TL`;
 
             const encoded = encodeURIComponent(text);
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`, '_blank');
