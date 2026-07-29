@@ -11,15 +11,12 @@
 </head>
 <body class="bg-gray-100 font-sans pb-28">
 
-    <!-- HEADER / ÜST BANT -->
+    <!-- HEADER / ÜST BANT (Admin butonu kaldırıldı) -->
     <header class="bg-red-700 text-white p-4 shadow-lg sticky top-0 z-40 flex justify-between items-center">
         <div>
             <h1 class="text-2xl font-black tracking-wide">🥙 BABACAN DÖNER</h1>
             <p class="text-xs text-red-200 font-medium">Hatay Dörtyol'un En İyi Dönercisi</p>
         </div>
-        <button onclick="toggleAdminPanel()" class="bg-red-800 hover:bg-red-900 text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1">
-            <i class="fa-solid fa-user-gear"></i> Admin
-        </button>
     </header>
 
     <!-- DÖRTYOL & MESAFE UYARI BANTI -->
@@ -98,18 +95,15 @@
 
             <!-- Modal İçerik -->
             <div class="p-4 overflow-y-auto space-y-4 flex-1">
-                <!-- Mesafe Uyarı Notu -->
                 <div class="bg-amber-100 border-l-4 border-amber-500 p-2.5 rounded text-xs text-amber-900 font-medium">
                     📍 <strong>Hatırlatma:</strong> Sanayi Mahallesi 16/C Dörtyol adresimize 6.99 KM üzeri mesafeler için +70 TL kurye teslimat ücreti eklenmektedir.
                 </div>
 
-                <!-- Sepetteki Ürünler -->
                 <div>
                     <h4 class="font-bold border-b pb-1 text-gray-700 text-sm">Sepet Özeti</h4>
                     <div id="cartItemsList" class="space-y-2 mt-2 max-h-36 overflow-y-auto pr-1"></div>
                 </div>
 
-                <!-- Detaylı Adres Bilgileri -->
                 <div class="space-y-2">
                     <h4 class="font-bold border-b pb-1 text-gray-700 text-sm">Teslimat Bilgileri</h4>
                     <div class="grid grid-cols-2 gap-2">
@@ -128,7 +122,6 @@
                     <textarea id="custNote" placeholder="Sipariş Notu / Adres Tarifi (Örn: Sos bol olsun)" class="p-2.5 border rounded-lg text-sm w-full h-16 focus:ring-1 focus:ring-red-600 outline-none"></textarea>
                 </div>
 
-                <!-- Ödeme Seçeneği -->
                 <div>
                     <h4 class="font-bold border-b pb-1 text-gray-700 text-sm mb-2">Ödeme Yöntemi Seçin</h4>
                     <div class="grid grid-cols-2 gap-3">
@@ -144,7 +137,6 @@
                 </div>
             </div>
 
-            <!-- Modal Altı (WhatsApp Butonu) -->
             <div class="p-4 bg-gray-50 border-t">
                 <button onclick="sendWhatsAppOrder()" class="w-full bg-green-600 hover:bg-green-700 active:scale-95 text-white font-bold py-3.5 rounded-xl shadow-lg flex justify-center items-center gap-2 text-md transition">
                     <i class="fa-brands fa-whatsapp text-2xl"></i> WhatsApp ile Siparişi Gönder
@@ -153,19 +145,19 @@
         </div>
     </div>
 
-    <!-- MODAL: ADMIN PANELI (ŞİFRE VE YÖNETİM) -->
-    <div id="adminModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
+    <!-- GİZLİ MODAL: ADMIN PANELI (URL'de #admin olduğunda tetiklenir) -->
+    <div id="adminModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
                 <h3 class="text-lg font-bold text-gray-800">⚙️ Babacan Döner Yönetim Paneli</h3>
-                <button onclick="toggleAdminPanel()" class="text-gray-500 text-xl font-bold">&times;</button>
+                <button onclick="closeAdminPanel()" class="text-gray-500 text-xl font-bold hover:text-gray-800">&times;</button>
             </div>
 
             <!-- Şifre Giriş Alanı -->
             <div id="adminAuthSection" class="text-center py-6">
                 <p class="text-sm text-gray-600 mb-3">Lütfen yönetici şifrenizi girin:</p>
-                <input type="password" id="adminPassInput" placeholder="Şifre (Varsayılan: 1234)" class="p-2 border rounded-lg text-center w-64 mb-3 block mx-auto">
-                <button onclick="loginAdmin()" class="bg-red-700 text-white font-bold px-6 py-2 rounded-lg hover:bg-red-800">Giriş Yap</button>
+                <input type="password" id="adminPassInput" placeholder="Şifreniz" onkeydown="if(event.key==='Enter') loginAdmin()" class="p-2 border rounded-lg text-center w-64 mb-3 block mx-auto outline-none focus:ring-2 focus:ring-red-600">
+                <button onclick="loginAdmin()" class="bg-red-700 text-white font-bold px-6 py-2 rounded-lg hover:bg-red-800 transition">Giriş Yap</button>
                 <p id="adminAuthError" class="text-red-600 text-xs mt-2 hidden">Hatalı Şifre!</p>
             </div>
 
@@ -198,15 +190,11 @@
         </div>
     </div>
 
-    <!-- TÜM JAVASCRIPT KODLARI (TEK DOSYADA) -->
+    <!-- JAVASCRIPT KODLARI -->
     <script>
-        // ==========================================
-        // İŞLETME AYARLARI
-        // ==========================================
-        const WHATSAPP_NUMBER = "905429099"; // İstediğin WhatsApp Numarası
-        const ADMIN_PASS = "1234"; // Admin Paneli Şifresi
+        const WHATSAPP_NUMBER = "905429099"; // WhatsApp Numarası
+        const ADMIN_PASS = "2026babacan";     // Güncellenmiş Admin Şifresi
 
-        // Varsayılan Dörtyol Babacan Döner Menüsü
         const defaultProducts = [
             { id: 1, title: "Hatay Usulü Tavuk Döner Dürüm", price: 110, category: "Dönerler", img: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=500", desc: "Özel Antakya sosu, sarımsaklı mayonez, patates kızartması ve turşu." },
             { id: 2, title: "Zurna Tavuk Döner (70 cm)", price: 150, category: "Dönerler", img: "https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=500", desc: "Dev boy lavaş, bol soslu, özel Baharatlı Dörtyol lezzeti." },
@@ -220,14 +208,45 @@
         let cart = JSON.parse(localStorage.getItem('babacan_cart')) || [];
         let selectedCategory = "Tümü";
 
-        // İLK YÜKLEME
         document.addEventListener('DOMContentLoaded', () => {
             renderCategories();
             renderProducts();
             updateCartBadge();
+            checkHashForAdmin();
         });
 
-        // KATEGORİLERİ ÇİZ
+        // URL Hash Kontrolü (#admin)
+        function checkHashForAdmin() {
+            if (window.location.hash === '#admin') {
+                document.getElementById('adminModal').classList.remove('hidden');
+            } else {
+                document.getElementById('adminModal').classList.add('hidden');
+            }
+        }
+
+        function closeAdminPanel() {
+            window.location.hash = '';
+            document.getElementById('adminPassInput').value = '';
+            document.getElementById('adminAuthError').classList.add('hidden');
+            document.getElementById('adminAuthSection').classList.remove('hidden');
+            document.getElementById('adminControlSection').classList.add('hidden');
+            document.getElementById('adminModal').classList.add('hidden');
+        }
+
+        function loginAdmin() {
+            const pass = document.getElementById('adminPassInput').value;
+            if (pass === ADMIN_PASS) {
+                document.getElementById('adminAuthSection').classList.add('hidden');
+                document.getElementById('adminControlSection').classList.remove('hidden');
+                renderAdminProducts();
+            } else {
+                document.getElementById('adminAuthError').classList.remove('hidden');
+            }
+        }
+
+        window.addEventListener('hashchange', checkHashForAdmin);
+
+        // KATEGORİ & ÜRÜN ÇİZİM İŞLEMLERİ
         function renderCategories() {
             const categories = ["Tümü", ...new Set(products.map(p => p.category))];
             const container = document.getElementById('categoryContainer');
@@ -245,7 +264,6 @@
             renderProducts();
         }
 
-        // ÜRÜNLERİ ÇİZ
         function renderProducts() {
             const container = document.getElementById('productList');
             const search = document.getElementById('searchInput').value.toLowerCase();
@@ -321,10 +339,9 @@
             document.getElementById('totalPrice').innerText = `${total.toFixed(2)} TL`;
         }
 
-        // MODAL AÇ/KAPAT
         function openCartModal() {
             if (cart.length === 0) {
-                alert("Sepetiniz boş! Lütfen lezzetli dönerlerimizden ekleyin.");
+                alert("Sepetiniz boş! Lütfen önce ürün ekleyin.");
                 return;
             }
             renderCartItems();
@@ -338,17 +355,20 @@
         function renderCartItems() {
             const container = document.getElementById('cartItemsList');
             container.innerHTML = cart.map(item => `
-                <div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg text-xs border">
+                <div class="flex justify-between items-center bg-gray-50 p-2 rounded text-xs border">
                     <div>
                         <span class="font-bold text-gray-800">${item.title}</span>
-                        <span class="text-gray-500 block">${item.count} Adet x ${item.price} TL</span>
+                        <span class="text-gray-500 block">${item.price.toFixed(2)} TL x ${item.count}</span>
                     </div>
-                    <span class="font-bold text-red-700">${(item.count * item.price).toFixed(2)} TL</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="changeCartCount(${item.id}, -1)" class="w-6 h-6 bg-gray-200 text-gray-800 rounded font-bold">-</button>
+                        <span class="font-bold">${item.count}</span>
+                        <button onclick="changeCartCount(${item.id}, 1)" class="w-6 h-6 bg-red-700 text-white rounded font-bold">+</button>
+                    </div>
                 </div>
             `).join('');
         }
 
-        // WHATSAPP ENTEGRASYONU VE SİPARİŞİ GÖNDERME
         function sendWhatsAppOrder() {
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
@@ -361,116 +381,86 @@
             const payment = document.querySelector('input[name="paymentMethod"]:checked').value;
 
             if (!name || !phone || !neighborhood || !street || !building || !apt) {
-                alert("Lütfen adres bilgilerindeki tüm zorunlu (*) alanları doldurun!");
+                alert("Lütfen tüm zorunlu (*) adres bilgilerini doldurun!");
                 return;
             }
 
-            let total = cart.reduce((sum, item) => sum + (item.price * item.count), 0);
+            let text = `*🥙 BABACAN DÖNER SİPARİŞİ*\n\n`;
+            text += `*Müşteri Bilgileri:*\n`;
+            text += `👤 *Ad Soyad:* ${name}\n`;
+            text += `📞 *Telefon:* ${phone}\n\n`;
 
-            // WhatsApp Mesajı Oluşturma
-            let msg = `*🥙 BABACAN DÖNER SİPARİŞİ*\n`;
-            msg += `-----------------------------------\n`;
-            msg += `*👤 Müşteri:* ${name}\n`;
-            msg += `*📞 Telefon:* ${phone}\n\n`;
-            msg += `*📍 DÖRTYOL TESLİMAT ADRESİ:*\n`;
-            msg += `${district} / ${neighborhood}\n`;
-            msg += `${street}, Bina No: ${building}, Daire: ${apt}\n`;
-            if (note) msg += `*📝 Sipariş Notu:* ${note}\n`;
-            msg += `\n-----------------------------------\n`;
-            msg += `*🛒 SİPARİŞ DETAYLARI:*\n`;
+            text += `*📍 Adres Bilgileri:*\n`;
+            text += `🏙️ *İlçe/Mahalle:* ${district} / ${neighborhood}\n`;
+            text += `🛣️ *Cadde/Sokak:* ${street}\n`;
+            text += `🏢 *Bina/Daire:* No: ${building}, D: ${apt}\n`;
+            if (note) text += `📝 *Sipariş Notu:* ${note}\n`;
+            text += `\n💳 *Ödeme Yöntemi:* ${payment}\n\n`;
 
+            text += `*🛍️ Sipariş Detayı:*\n`;
+            let total = 0;
             cart.forEach(item => {
-                msg += `• ${item.count} Adet ${item.title} - ${(item.price * item.count).toFixed(2)} TL\n`;
+                const subtotal = item.price * item.count;
+                total += subtotal;
+                text += `• ${item.title} x${item.count} = ${subtotal.toFixed(2)} TL\n`;
             });
 
-            msg += `-----------------------------------\n`;
-            msg += `*💳 Ödeme Tipi:* ${payment}\n`;
-            msg += `*💰 TOPLAM SEPET:* ${total.toFixed(2)} TL\n`;
-            msg += `*(⚠️ 6.99 km üzeri teslimatlarda +70 TL kurye ücreti hariçtir)*\n`;
+            text += `\n*💰 Toplam Tutar:* ${total.toFixed(2)} TL\n`;
+            text += `⚠️ *(İşletmeye 6.99 KM üzeri mesafelerde +70 TL kurye ücreti yansıtılabilir)*`;
 
-            const encoded = encodeURIComponent(msg);
-            const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
-
-            // Sepeti Temizle & Yönlendir
-            cart = [];
-            localStorage.removeItem('babacan_cart');
-            updateCartBadge();
-            closeCartModal();
-            window.open(waUrl, '_blank');
+            const encoded = encodeURIComponent(text);
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`, '_blank');
         }
 
-        // ADMIN PANELİ İŞLEMLERİ
-        function toggleAdminPanel() {
-            const modal = document.getElementById('adminModal');
-            modal.classList.toggle('hidden');
-        }
-
-        function loginAdmin() {
-            const pass = document.getElementById('adminPassInput').value;
-            if (pass === ADMIN_PASS) {
-                document.getElementById('adminAuthSection').classList.add('hidden');
-                document.getElementById('adminControlSection').classList.remove('hidden');
-                renderAdminProducts();
-            } else {
-                document.getElementById('adminAuthError').classList.remove('hidden');
-            }
-        }
-
+        // ADMIN YÖNETİM FONKSİYONLARI
         function renderAdminProducts() {
             const container = document.getElementById('adminProductList');
             container.innerHTML = products.map(p => `
-                <div class="flex items-center justify-between border p-2 rounded-lg bg-white text-xs">
-                    <div class="flex items-center gap-2">
-                        <img src="${p.img || 'https://via.placeholder.com/40'}" class="w-10 h-10 object-cover rounded">
-                        <div>
-                            <h5 class="font-bold text-gray-800">${p.title}</h5>
-                            <span class="text-red-700 font-bold">${p.price} TL</span> - <span class="text-gray-500">${p.category}</span>
-                        </div>
+                <div class="flex justify-between items-center p-2 border rounded bg-white text-xs">
+                    <div>
+                        <span class="font-bold">${p.title}</span> - <span class="text-red-600 font-bold">${p.price} TL</span>
+                        <span class="text-gray-400 block text-[10px]">${p.category}</span>
                     </div>
-                    <button onclick="deleteProduct(${p.id})" class="text-red-600 hover:text-red-800 p-2 font-bold">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
+                    <button onclick="deleteProduct(${p.id})" class="bg-red-600 text-white px-2 py-1 rounded font-bold hover:bg-red-700">Sil</button>
                 </div>
             `).join('');
         }
 
         function handleAddProduct(e) {
             e.preventDefault();
-            const newP = {
+            const newProd = {
                 id: Date.now(),
-                title: document.getElementById('pTitle').value,
+                title: document.getElementById('pTitle').value.trim(),
                 price: parseFloat(document.getElementById('pPrice').value),
-                category: document.getElementById('pCategory').value,
-                img: document.getElementById('pImg').value || "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=500",
-                desc: document.getElementById('pDesc').value
+                category: document.getElementById('pCategory').value.trim(),
+                img: document.getElementById('pImg').value.trim() || 'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=500',
+                desc: document.getElementById('pDesc').value.trim()
             };
-            products.push(newP);
-            localStorage.setItem('babacan_products', JSON.stringify(products));
-            renderAdminProducts();
-            renderCategories();
-            renderProducts();
+
+            products.push(newProd);
+            saveAndReloadProducts();
             e.target.reset();
-            alert("Yeni ürün eklendi!");
         }
 
         function deleteProduct(id) {
-            if (confirm("Bu ürünü menüden kaldırmak istediğinize emin misiniz?")) {
+            if (confirm("Bu ürünü silmek istediğinize emin misiniz?")) {
                 products = products.filter(p => p.id !== id);
-                localStorage.setItem('babacan_products', JSON.stringify(products));
-                renderAdminProducts();
-                renderCategories();
-                renderProducts();
+                saveAndReloadProducts();
             }
         }
 
         function resetDefaultMenu() {
-            if (confirm("Varsayılan menüye dönülecek. Onaylıyor musunuz?")) {
-                products = defaultProducts;
-                localStorage.setItem('babacan_products', JSON.stringify(products));
-                renderAdminProducts();
-                renderCategories();
-                renderProducts();
+            if (confirm("Tüm menü varsayılan ürünlere sıfırlanacak. Onaylıyor musunuz?")) {
+                products = [...defaultProducts];
+                saveAndReloadProducts();
             }
+        }
+
+        function saveAndReloadProducts() {
+            localStorage.setItem('babacan_products', JSON.stringify(products));
+            renderCategories();
+            renderProducts();
+            renderAdminProducts();
         }
     </script>
 </body>
