@@ -25,7 +25,7 @@
             <i class="fa-solid fa-truck-fast text-xl shrink-0"></i>
             <div>
                 <span>📍 Adresimiz: Sanayi Mahallesi Özel Cad. 16/C, Dörtyol / Hatay</span>
-                <p class="text-red-950 text-xs mt-0.5">⚠️ <strong>Otomatik Konum Hesabı:</strong> Konumunuza göre 6.99 km üzeri mesafelerde sepetinize otomatik +70 TL kurye ücreti eklenir.</p>
+                <p class="text-red-950 text-xs mt-0.5">⚠️ <strong>Otomatik Konum Hesabı:</strong> Sipariş gönderilmeden önce konumunuz kontrol edilir; 6.99 km üzeri mesafelerde sepetinize +70 TL kurye ücreti eklenir.</p>
             </div>
         </div>
     </div>
@@ -96,15 +96,12 @@
             <!-- Modal İçerik -->
             <div class="p-4 overflow-y-auto space-y-4 flex-1">
                 
-                <!-- Konum İzin / Mesafe Bilgisi Kutusu -->
-                <div id="locationStatusBox" class="bg-blue-50 border border-blue-200 p-3 rounded-xl flex items-center justify-between gap-2">
-                    <div class="text-xs text-blue-900">
-                        <i class="fa-solid fa-location-crosshairs text-blue-600 text-base mr-1"></i>
-                        <span id="locationStatusText">Teslimat ücreti hesabı için konumunuzu doğrulayın.</span>
+                <!-- Konum Durum Kutusu -->
+                <div id="locationStatusBox" class="bg-amber-50 border border-amber-200 p-3 rounded-xl flex items-center justify-between gap-2">
+                    <div class="text-xs text-amber-900">
+                        <i class="fa-solid fa-location-dot text-red-600 text-base mr-1"></i>
+                        <span id="locationStatusText">WhatsApp'a Aktarmadan Önce Konumunuz Otomatik Doğrulanacaktır.</span>
                     </div>
-                    <button onclick="getUserLocation()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg shrink-0 transition">
-                        Konum Hesapla
-                    </button>
                 </div>
 
                 <!-- Sepetteki Ürünler -->
@@ -149,8 +146,8 @@
             </div>
 
             <div class="p-4 bg-gray-50 border-t">
-                <button onclick="sendWhatsAppOrder()" class="w-full bg-green-600 hover:bg-green-700 active:scale-95 text-white font-bold py-3.5 rounded-xl shadow-lg flex justify-center items-center gap-2 text-md transition">
-                    <i class="fa-brands fa-whatsapp text-2xl"></i> WhatsApp ile Siparişi Gönder
+                <button id="submitBtn" onclick="processOrderFlow()" class="w-full bg-green-600 hover:bg-green-700 active:scale-95 text-white font-bold py-3.5 rounded-xl shadow-lg flex justify-center items-center gap-2 text-md transition">
+                    <i class="fa-brands fa-whatsapp text-2xl"></i> <span id="submitBtnText">Konumu Hesapla ve Siparişi Gönder</span>
                 </button>
             </div>
         </div>
@@ -201,7 +198,7 @@
 
     <!-- JAVASCRIPT KODLARI -->
     <script>
-        const WHATSAPP_NUMBER = "905050619393"; // GÜNCELLENEN TELEFON NUMARASI
+        const WHATSAPP_NUMBER = "905050619393"; 
         const ADMIN_PASS = "2026babacan";     
 
         // DÜKKAN KOORDİNATLARI (Dörtyol Sanayi Mah. Özel Cad. 16/C)
@@ -211,9 +208,9 @@
         const MAX_FREE_KM = 6.99;
 
         let userDistance = 0;
+        let isLocationCalculated = false;
         let deliveryFeeApplied = false;
 
-        // ÇİĞKÖFTE KONSEPTİNE UYGUN VARSAYILAN ÜRÜNLER
         const defaultProducts = [
             { id: 1, title: "Çiğköfte Dürüm", price: 50, category: "Dürümler", img: "https://images.unsplash.com/photo-1627364177651-7a6c986c55cc?w=500", desc: "Taze yeşillik, nar ekşisi, acı sos ve limon ile klasik dürüm." },
             { id: 2, title: "Mega Çiğköfte Dürüm", price: 75, category: "Dürümler", img: "https://images.unsplash.com/photo-1627364177651-7a6c986c55cc?w=500", desc: "Çift lavaş ve bol malzemeli doyurucu mega boy." },
@@ -223,7 +220,6 @@
             { id: 6, title: "Yayık Ayran (300 ml)", price: 20, category: "İçecekler", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=500", desc: "Çiğköftenin yanına buz gibi köpüklü ayran." }
         ];
 
-        // Yeni marka için localStorage isimleri güncellendi
         let products = JSON.parse(localStorage.getItem('babacan_cigkofte_products')) || defaultProducts;
         let cart = JSON.parse(localStorage.getItem('babacan_cigkofte_cart')) || [];
         let selectedCategory = "Tümü";
@@ -235,9 +231,9 @@
             checkHashForAdmin();
         });
 
-        // HAVERSINE FORMÜLÜ (2 koordinat arası KM ölçümü)
+        // HAVERSINE FORMÜLÜ
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Dünya yarıçapı (km)
+            const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = 
@@ -248,17 +244,41 @@
             return R * c; 
         }
 
-        // KONUM ALMA FONKSİYONU
-        function getUserLocation() {
-            const statusText = document.getElementById('locationStatusText');
-            const statusBox = document.getElementById('locationStatusBox');
+        // AKIŞ KONTROLÜ: ÖNCE KONUM HESAPLA, SONRA WHATSAPP'A GÖNDER
+        function processOrderFlow() {
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const neighborhood = document.getElementById('custNeighborhood').value.trim();
+            const street = document.getElementById('custStreet').value.trim();
+            const building = document.getElementById('custBuilding').value.trim();
+            const apt = document.getElementById('custApt').value.trim();
 
-            if (!navigator.geolocation) {
-                alert("Tarayıcınız konum servislerini desteklemiyor.");
+            if (!name || !phone || !neighborhood || !street || !building || !apt) {
+                alert("Lütfen önce tüm zorunlu (*) adres bilgilerini doldurun!");
                 return;
             }
 
-            statusText.innerText = "Konumunuz alınıyor...";
+            // Konum henüz hesaplanmadıysa otomatik hesapla
+            if (!isLocationCalculated) {
+                calculateLocationAndProceed();
+            } else {
+                sendWhatsAppOrder();
+            }
+        }
+
+        function calculateLocationAndProceed() {
+            const statusText = document.getElementById('locationStatusText');
+            const statusBox = document.getElementById('locationStatusBox');
+            const submitBtnText = document.getElementById('submitBtnText');
+
+            if (!navigator.geolocation) {
+                alert("Tarayıcınız konum servislerini desteklemiyor. Sipariş konumsuz gönderiliyor.");
+                isLocationCalculated = true;
+                sendWhatsAppOrder();
+                return;
+            }
+
+            statusText.innerText = "📍 Konumunuz hesaplanıyor, lütfen bekleyin...";
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -266,22 +286,32 @@
                     const uLng = position.coords.longitude;
                     
                     userDistance = calculateDistance(SHOP_LAT, SHOP_LNG, uLat, uLng);
+                    isLocationCalculated = true;
                     
                     if (userDistance > MAX_FREE_KM) {
                         deliveryFeeApplied = true;
                         statusBox.className = "bg-amber-100 border border-amber-300 p-3 rounded-xl flex items-center justify-between gap-2";
-                        statusText.innerHTML = `📍 Mesafeniz <strong>${userDistance.toFixed(2)} km</strong> (6.99 km üzeri olduğu için +70 TL kurye ücreti yansıtıldı).`;
+                        statusText.innerHTML = `🚨 Mesafeniz <strong>${userDistance.toFixed(2)} km</strong> (>6.99 km). Toplama +70 TL kurye ücreti eklendi.`;
                     } else {
                         deliveryFeeApplied = false;
                         statusBox.className = "bg-green-100 border border-green-300 p-3 rounded-xl flex items-center justify-between gap-2";
-                        statusText.innerHTML = `📍 Mesafeniz <strong>${userDistance.toFixed(2)} km</strong> (Kurye ücreti aranmamaktadır).`;
+                        statusText.innerHTML = `✅ Mesafeniz <strong>${userDistance.toFixed(2)} km</strong>. Kurye teslimat ücreti yoktur.`;
                     }
+                    
                     updateCartBadge();
                     renderCartItems();
+                    submitBtnText.innerText = "Siparişi WhatsApp'a Gönder";
+
+                    // Konum hesabı bitti, kullanıcıya teyit verip siparişi aktar
+                    setTimeout(() => {
+                        sendWhatsAppOrder();
+                    }, 800);
                 },
                 (error) => {
-                    alert("Konum izni verilemedi. Lütfen tarayıcı ayarlarından konum iznini kontrol edin.");
-                    statusText.innerText = "Konum alınamadı. Manuel adres bilgisi giriniz.";
+                    alert("Konum izni alınamadı. Sipariş konumsuz olarak aktarılıyor.");
+                    isLocationCalculated = true;
+                    statusText.innerText = "Konum alınamadı. Manuel adres bilgisi ile devam ediliyor.";
+                    sendWhatsAppOrder();
                 }
             );
         }
@@ -467,11 +497,6 @@
             const note = document.getElementById('custNote').value.trim();
             const payment = document.querySelector('input[name="paymentMethod"]:checked').value;
 
-            if (!name || !phone || !neighborhood || !street || !building || !apt) {
-                alert("Lütfen tüm zorunlu (*) adres bilgilerini doldurun!");
-                return;
-            }
-
             let text = `*🌯 BABACAN ÇİĞKÖFTE SİPARİŞİ*\n\n`;
             text += `*Müşteri Bilgileri:*\n`;
             text += `👤 *Ad Soyad:* ${name}\n`;
@@ -481,7 +506,7 @@
             text += `🏙️ *İlçe/Mahalle:* ${district} / ${neighborhood}\n`;
             text += `🛣️ *Cadde/Sokak:* ${street}\n`;
             text += `🏢 *Bina/Daire:* No: ${building}, D: ${apt}\n`;
-            if (userDistance > 0) text += `📏 *Hesaplanan Mesafe:* ${userDistance.toFixed(2)} km\n`;
+            if (userDistance > 0) text += `📏 *Mesafe Hesabı:* ${userDistance.toFixed(2)} km\n`;
             if (note) text += `📝 *Sipariş Notu:* ${note}\n`;
             text += `\n💳 *Ödeme Yöntemi:* ${payment}\n\n`;
 
