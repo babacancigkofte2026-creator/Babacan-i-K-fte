@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Babacan Döner - Hatay Dörtyol En İyi Dönercisi</title>
+    <title>Babacan Çiğköfte - Hatay Dörtyol En İyi Çiğköftecisi</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icon Seti -->
@@ -14,8 +14,8 @@
     <!-- HEADER / ÜST BANT -->
     <header class="bg-red-700 text-white p-4 shadow-lg sticky top-0 z-40 flex justify-between items-center">
         <div>
-            <h1 class="text-2xl font-black tracking-wide">🥙 BABACAN DÖNER</h1>
-            <p class="text-xs text-red-200 font-medium">Hatay Dörtyol'un En İyi Dönercisi</p>
+            <h1 class="text-2xl font-black tracking-wide">🌯 BABACAN ÇİĞKÖFTE</h1>
+            <p class="text-xs text-red-200 font-medium">Hatay Dörtyol'un En İyi Çiğköftecisi</p>
         </div>
     </header>
 
@@ -129,7 +129,7 @@
                         <input type="text" id="custBuilding" placeholder="Bina Adı / No *" class="p-2.5 border rounded-lg text-sm w-full focus:ring-1 focus:ring-red-600 outline-none" required>
                         <input type="text" id="custApt" placeholder="Daire No *" class="p-2.5 border rounded-lg text-sm w-full focus:ring-1 focus:ring-red-600 outline-none" required>
                     </div>
-                    <textarea id="custNote" placeholder="Sipariş Notu / Adres Tarifi (Örn: Sos bol olsun)" class="p-2.5 border rounded-lg text-sm w-full h-16 focus:ring-1 focus:ring-red-600 outline-none"></textarea>
+                    <textarea id="custNote" placeholder="Sipariş Notu / Adres Tarifi (Örn: Acı sos bol olsun, yeşillik taze olsun)" class="p-2.5 border rounded-lg text-sm w-full h-16 focus:ring-1 focus:ring-red-600 outline-none"></textarea>
                 </div>
 
                 <!-- Ödeme Seçeneği -->
@@ -160,7 +160,7 @@
     <div id="adminModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
-                <h3 class="text-lg font-bold text-gray-800">⚙️ Babacan Döner Yönetim Paneli</h3>
+                <h3 class="text-lg font-bold text-gray-800">⚙️ Babacan Çiğköfte Yönetim Paneli</h3>
                 <button onclick="closeAdminPanel()" class="text-gray-500 text-xl font-bold hover:text-gray-800">&times;</button>
             </div>
 
@@ -201,7 +201,7 @@
 
     <!-- JAVASCRIPT KODLARI -->
     <script>
-        const WHATSAPP_NUMBER = "905429099"; 
+        const WHATSAPP_NUMBER = "905050619393"; // GÜNCELLENEN TELEFON NUMARASI
         const ADMIN_PASS = "2026babacan";     
 
         // DÜKKAN KOORDİNATLARI (Dörtyol Sanayi Mah. Özel Cad. 16/C)
@@ -213,17 +213,19 @@
         let userDistance = 0;
         let deliveryFeeApplied = false;
 
+        // ÇİĞKÖFTE KONSEPTİNE UYGUN VARSAYILAN ÜRÜNLER
         const defaultProducts = [
-            { id: 1, title: "Hatay Usulü Tavuk Döner Dürüm", price: 110, category: "Dönerler", img: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=500", desc: "Özel Antakya sosu, sarımsaklı mayonez, patates kızartması ve turşu." },
-            { id: 2, title: "Zurna Tavuk Döner (70 cm)", price: 150, category: "Dönerler", img: "https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=500", desc: "Dev boy lavaş, bol soslu, özel Baharatlı Dörtyol lezzeti." },
-            { id: 3, title: "Babacan Özel Et Döner Dürüm", price: 180, category: "Dönerler", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500", desc: "%100 Yaprak et döner, domates, soğan ve özel iskender sosu." },
-            { id: 4, title: "Porsiyon Tavuk Döner", price: 170, category: "Porsiyonlar", img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500", desc: "Pilav üstü tavuk döner, patates, közlenmiş biber ve açık ayran ile." },
+            { id: 1, title: "Çiğköfte Dürüm", price: 50, category: "Dürümler", img: "https://images.unsplash.com/photo-1627364177651-7a6c986c55cc?w=500", desc: "Taze yeşillik, nar ekşisi, acı sos ve limon ile klasik dürüm." },
+            { id: 2, title: "Mega Çiğköfte Dürüm", price: 75, category: "Dürümler", img: "https://images.unsplash.com/photo-1627364177651-7a6c986c55cc?w=500", desc: "Çift lavaş ve bol malzemeli doyurucu mega boy." },
+            { id: 3, title: "Porsiyon Çiğköfte (400 gr)", price: 120, category: "Porsiyonlar", img: "https://images.unsplash.com/photo-1627364177651-7a6c986c55cc?w=500", desc: "Göbek marul, maydanoz, nane, limon, nar ekşisi ve acı sos ile tam porsiyon." },
+            { id: 4, title: "Aile Boyu Çiğköfte (800 gr)", price: 220, category: "Porsiyonlar", img: "https://images.unsplash.com/photo-1627364177651-7a6c986c55cc?w=500", desc: "Kalabalık sofralar için bol yeşillikli aile boyu tepsi porsiyon." },
             { id: 5, title: "Kutu Cola / Fanta", price: 35, category: "İçecekler", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500", desc: "Soğuk kutu içecek." },
-            { id: 6, title: "Yayık Ayran (330 ml)", price: 25, category: "İçecekler", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=500", desc: "Bol köpüklü taze yayık ayranı." }
+            { id: 6, title: "Yayık Ayran (300 ml)", price: 20, category: "İçecekler", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=500", desc: "Çiğköftenin yanına buz gibi köpüklü ayran." }
         ];
 
-        let products = JSON.parse(localStorage.getItem('babacan_products')) || defaultProducts;
-        let cart = JSON.parse(localStorage.getItem('babacan_cart')) || [];
+        // Yeni marka için localStorage isimleri güncellendi
+        let products = JSON.parse(localStorage.getItem('babacan_cigkofte_products')) || defaultProducts;
+        let cart = JSON.parse(localStorage.getItem('babacan_cigkofte_cart')) || [];
         let selectedCategory = "Tümü";
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -393,7 +395,7 @@
                 cart.push({ ...product, count: 1 });
             }
 
-            localStorage.setItem('babacan_cart', JSON.stringify(cart));
+            localStorage.setItem('babacan_cigkofte_cart', JSON.stringify(cart));
             renderProducts();
             updateCartBadge();
             if (!document.getElementById('cartModal').classList.contains('hidden')) {
@@ -470,7 +472,7 @@
                 return;
             }
 
-            let text = `*🥙 BABACAN DÖNER SİPARİŞİ*\n\n`;
+            let text = `*🌯 BABACAN ÇİĞKÖFTE SİPARİŞİ*\n\n`;
             text += `*Müşteri Bilgileri:*\n`;
             text += `👤 *Ad Soyad:* ${name}\n`;
             text += `📞 *Telefon:* ${phone}\n\n`;
@@ -523,7 +525,7 @@
                 title: document.getElementById('pTitle').value.trim(),
                 price: parseFloat(document.getElementById('pPrice').value),
                 category: document.getElementById('pCategory').value.trim(),
-                img: document.getElementById('pImg').value.trim() || 'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=500',
+                img: document.getElementById('pImg').value.trim() || 'https://images.unsplash.com/photo-1627364177651-7a6c986c55cc?w=500',
                 desc: document.getElementById('pDesc').value.trim()
             };
 
@@ -547,7 +549,7 @@
         }
 
         function saveAndReloadProducts() {
-            localStorage.setItem('babacan_products', JSON.stringify(products));
+            localStorage.setItem('babacan_cigkofte_products', JSON.stringify(products));
             renderCategories();
             renderProducts();
             renderAdminProducts();
